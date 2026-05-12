@@ -1,0 +1,3054 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a1a">
+<title>Beifahrer · Pitch-Prototyp v4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #1c1c1c;
+  --bg-soft: #232323;
+  --bg-card: #2a2a2a;
+  --bg-elev: #333333;
+  --line: #383838;
+  --line-bright: #4a4a4a;
+  --text: #f0f0ed;
+  --text-soft: #b8b8b3;
+  --text-muted: #7a7a75;
+  --yellow: #FFEE00;
+  --yellow-dim: #d4c400;
+  --yellow-glow: rgba(255, 238, 0, 0.12);
+  --red-alert: #ff5252;
+  --green-ok: #6bcf7f;
+  --sans: 'Inter Tight', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'Courier New', monospace;
+  --shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  font-family: var(--sans);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === Frame === */
+.frame-wrapper {
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.frame-context {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  max-width: 320px;
+  z-index: 2;
+  color: #1a1a1a;
+}
+.frame-context .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 18px;
+  padding: 6px 10px;
+  border: 1px solid #1a1a1a;
+  background: var(--yellow);
+}
+.frame-context .logo::before {
+  content: '»»';
+  letter-spacing: -0.1em;
+}
+.frame-context h1 {
+  font-family: var(--sans);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+}
+.frame-context h1 em {
+  font-style: normal;
+  color: #c4a800;
+  background: var(--yellow);
+  padding: 0 6px;
+  border-radius: 4px;
+}
+.frame-context p {
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #555;
+  max-width: 280px;
+}
+
+.pitch-hint {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  max-width: 320px;
+  color: #888;
+  font-size: 11px;
+  font-family: var(--mono);
+  line-height: 1.6;
+  z-index: 2;
+}
+.pitch-hint b { color: #1a1a1a; font-weight: 700; background: var(--yellow); padding: 0 4px; }
+
+/* === Phone === */
+.phone {
+  width: 390px;
+  height: 800px;
+  max-height: calc(100vh - 40px);
+  background: var(--bg);
+  border-radius: 44px;
+  box-shadow: 
+    0 0 0 10px #1a1a1a,
+    0 0 0 11px #444,
+    0 40px 100px rgba(0,0,0,0.25),
+    0 10px 30px rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+
+.notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 32px;
+  background: #000;
+  border-radius: 0 0 18px 18px;
+  z-index: 100;
+}
+
+.status-bar {
+  height: 50px;
+  padding: 16px 30px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.status-bar .icons { display: flex; gap: 8px; align-items: center; font-size: 11px; }
+
+/* === Screen === */
+.screen {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 100px;
+}
+.screen::-webkit-scrollbar { display: none; }
+
+.view { display: none; animation: fadeIn 0.3s ease-out; }
+.view.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === HOME === */
+.home-header {
+  padding: 16px 24px 24px;
+}
+.home-greeting {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.home-name {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-top: 4px;
+  line-height: 1.1;
+}
+
+.progress-card {
+  margin: 0 24px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.progress-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, var(--yellow) 0%, transparent 70%);
+  opacity: 0.15;
+}
+.progress-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  font-weight: 700;
+  position: relative;
+}
+.progress-km {
+  font-size: 44px;
+  font-weight: 700;
+  margin-top: 8px;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  line-height: 1;
+  position: relative;
+}
+.progress-km .of {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.progress-bar {
+  height: 5px;
+  background: var(--bg-elev);
+  border-radius: 3px;
+  margin-top: 18px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--yellow);
+  border-radius: 3px;
+  position: relative;
+  transition: width 0.5s ease;
+}
+.progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  width: 11px;
+  height: 11px;
+  background: var(--yellow);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(255, 238, 0, 0.2);
+}
+.progress-meta {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+.progress-meta strong { color: var(--text); font-weight: 600; }
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0 24px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  letter-spacing: -0.01em;
+}
+.section-title small {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+
+.module-grid {
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.module-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.module-card:active { transform: scale(0.97); }
+.module-card:hover { border-color: var(--line-bright); }
+.module-card.wide { 
+  grid-column: 1 / -1; 
+  min-height: auto; 
+  flex-direction: row; 
+  align-items: center; 
+  gap: 16px; 
+  padding: 18px 20px; 
+}
+.module-card.wide .module-text { flex: 1; }
+
+.module-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg-elev);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--yellow);
+}
+.module-card.featured {
+  background: var(--yellow);
+  border-color: var(--yellow);
+}
+.module-card.featured .module-icon { background: var(--bg); color: var(--yellow); }
+.module-card.featured .module-label { color: var(--bg); }
+.module-card.featured .module-sub { color: rgba(0,0,0,0.6); }
+
+.module-label {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+.module-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.module-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--yellow);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.08em;
+}
+
+.next-trip {
+  margin: 0 24px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--yellow);
+  border-radius: 14px;
+  padding: 18px 20px;
+  cursor: pointer;
+}
+.next-trip:active { background: var(--bg-elev); }
+.next-trip-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  color: var(--yellow);
+}
+.next-trip-text {
+  font-size: 15px;
+  margin-top: 6px;
+  line-height: 1.4;
+  color: var(--text);
+  font-weight: 500;
+}
+.next-trip-text strong { color: var(--yellow); font-weight: 600; }
+
+/* === Sub-headers === */
+.sub-header {
+  padding: 8px 20px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.back-btn:active { background: var(--yellow); color: var(--bg); border-color: var(--yellow); }
+.sub-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.sub-title-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* === Module 1: Drive === */
+.coaching-card {
+  margin: 0 20px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+}
+.coaching-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  font-weight: 700;
+}
+.coaching-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 8px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.topic-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.topic-pill {
+  background: transparent;
+  border: 1px solid var(--line-bright);
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-soft);
+}
+.topic-pill:hover { border-color: var(--text); color: var(--text); }
+.topic-pill.active {
+  background: var(--yellow);
+  color: var(--bg);
+  border-color: var(--yellow);
+  font-weight: 600;
+}
+
+.coaching-tip {
+  margin: 0 20px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--yellow);
+  border-radius: 20px;
+  padding: 22px;
+  position: relative;
+}
+.tip-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  font-weight: 700;
+}
+.tip-text {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  margin-top: 10px;
+  color: var(--text);
+}
+.tip-steps {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-bright);
+}
+.tip-steps-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.tip-step {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-soft);
+}
+.tip-step:last-child { margin-bottom: 0; }
+.tip-step .num {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--yellow);
+  flex-shrink: 0;
+  font-size: 11px;
+  padding-top: 2px;
+  min-width: 18px;
+}
+.tip-after {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-bright);
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+.tip-after strong { color: var(--yellow); font-weight: 600; }
+
+.start-cta {
+  margin: 0 20px;
+  background: var(--yellow);
+  color: var(--bg);
+  border: none;
+  width: calc(100% - 40px);
+  padding: 20px;
+  border-radius: 18px;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.005em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.15s;
+}
+.start-cta:active { transform: scale(0.98); }
+.start-cta .dot {
+  width: 8px;
+  height: 8px;
+  background: var(--red-alert);
+  border-radius: 50%;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* === Tracking === */
+.tracking-active {
+  padding: 30px 24px;
+  min-height: 520px;
+  background: var(--bg-soft);
+  position: relative;
+  overflow: hidden;
+}
+.tracking-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 20%, var(--yellow-glow) 0%, transparent 60%);
+  pointer-events: none;
+}
+.tracking-topic {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.tracking-topic::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--red-alert);
+  border-radius: 50%;
+  animation: pulse 1.2s infinite;
+}
+.tracking-elapsed {
+  font-size: 56px;
+  font-weight: 700;
+  margin-top: 12px;
+  letter-spacing: -0.04em;
+  font-feature-settings: 'tnum';
+  position: relative;
+  line-height: 1;
+}
+.tracking-stats {
+  display: flex;
+  gap: 30px;
+  margin-top: 24px;
+  position: relative;
+}
+.tstat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.tstat-value {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.live-map {
+  margin-top: 28px;
+  height: 200px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.live-map svg { width: 100%; height: 100%; }
+
+.stop-btn {
+  margin-top: 24px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line-bright);
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+}
+.stop-btn:active { background: var(--red-alert); border-color: var(--red-alert); color: var(--bg); }
+
+/* === Debrief === */
+.debrief-question {
+  margin: 0 20px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+}
+.debrief-who {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.debrief-who.bewerber { background: var(--yellow); color: var(--bg); }
+.debrief-who.begleiter { background: var(--bg-elev); color: var(--text); border: 1px solid var(--line-bright); }
+.debrief-q {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.rating {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.rating-dot {
+  flex: 1;
+  height: 44px;
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text-soft);
+}
+.rating-dot:hover { border-color: var(--text); color: var(--text); }
+.rating-dot.selected {
+  background: var(--yellow);
+  color: var(--bg);
+  border-color: var(--yellow);
+}
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.debrief-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 14px;
+  border-radius: 12px;
+  font-family: var(--sans);
+  font-size: 13px;
+  resize: none;
+  margin-top: 12px;
+  color: var(--text);
+}
+.debrief-textarea:focus { outline: none; border-color: var(--yellow); }
+
+/* === Trip History === */
+.history-list {
+  padding: 0 20px;
+}
+.history-trip {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.history-trip:active { border-color: var(--yellow); }
+.history-trip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.history-date {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.history-km {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--yellow);
+}
+.history-topic {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+  color: var(--text);
+}
+.history-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.03em;
+}
+
+/* === Theorie === */
+.theorie-intro {
+  margin: 0 20px 22px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--yellow);
+  border-radius: 12px;
+}
+.theorie-intro strong { color: var(--text); font-weight: 600; }
+
+.theorie-topic {
+  margin: 0 20px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.theorie-topic:hover { border-color: var(--line-bright); }
+.theorie-topic:active { border-color: var(--yellow); }
+.topic-num {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-muted);
+  width: 28px;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.topic-body { flex: 1; }
+.topic-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.topic-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.03em;
+}
+.topic-status {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.topic-status.done { background: var(--green-ok); color: var(--bg); }
+.topic-status.new { background: var(--yellow); color: var(--bg); }
+.topic-status.todo { background: var(--bg); color: var(--text-muted); border: 1px solid var(--line-bright); font-size: 11px; }
+
+/* === Quiz === */
+.quiz-card {
+  margin: 0 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 24px 22px;
+}
+.quiz-progress {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.quiz-progress span {
+  flex: 1;
+  height: 3px;
+  background: var(--bg);
+  border-radius: 2px;
+}
+.quiz-progress span.active { background: var(--yellow); }
+.quiz-progress span.done { background: var(--green-ok); }
+
+.quiz-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.quiz-eyebrow .alert-tag {
+  background: var(--red-alert);
+  color: var(--bg);
+  padding: 2px 7px;
+  font-size: 9px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+.quiz-question {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+.quiz-context {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  border-left: 2px solid var(--yellow);
+}
+.quiz-answers {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quiz-answer {
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sans);
+  color: var(--text);
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.quiz-answer:hover { border-color: var(--text); }
+.quiz-answer.correct { background: var(--green-ok); border-color: var(--green-ok); color: var(--bg); font-weight: 600; }
+.quiz-answer.wrong { background: var(--red-alert); border-color: var(--red-alert); color: var(--bg); }
+.quiz-letter {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-elev);
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--yellow);
+}
+.quiz-answer.correct .quiz-letter,
+.quiz-answer.wrong .quiz-letter { background: var(--bg); color: var(--yellow); }
+
+.quiz-feedback {
+  margin: 14px 20px 0;
+  background: var(--bg-card);
+  border: 1px solid var(--green-ok);
+  border-left: 3px solid var(--green-ok);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.wrong { border-color: var(--red-alert); border-left-color: var(--red-alert); }
+.feedback-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--green-ok);
+  font-weight: 700;
+}
+.quiz-feedback.wrong .feedback-label { color: var(--red-alert); }
+.feedback-text {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 6px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.feedback-paragraph {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+.next-quiz-btn {
+  width: 100%;
+  background: var(--yellow);
+  color: var(--bg);
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 14px;
+}
+.next-quiz-btn:active { transform: scale(0.98); }
+
+/* === Routes === */
+.map-container {
+  margin: 0 20px 16px;
+  height: 280px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.map-container svg { width: 100%; height: 100%; }
+.map-container::before {
+  content: 'ALBSTADT';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--yellow);
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  background: var(--bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--yellow);
+  z-index: 2;
+}
+
+.filter-row {
+  padding: 0 20px 18px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--text-soft);
+  transition: all 0.15s;
+}
+.filter-chip.active {
+  background: var(--yellow);
+  color: var(--bg);
+  border-color: var(--yellow);
+  font-weight: 600;
+}
+
+.route-card {
+  margin: 0 20px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 20px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s;
+}
+.route-card:active { border-color: var(--yellow); }
+.route-card:hover { border-color: var(--line-bright); }
+.route-tier {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.route-tier.beginner { background: rgba(107,207,127,0.15); color: var(--green-ok); }
+.route-tier.intermediate { background: var(--bg-elev); color: var(--text-soft); }
+.route-tier.advanced { background: var(--yellow-glow); color: var(--yellow); }
+.route-name {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  max-width: 75%;
+  line-height: 1.2;
+}
+.route-meta {
+  margin-top: 8px;
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.route-meta strong { color: var(--text); font-weight: 600; }
+.route-tags {
+  margin-top: 12px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.route-tag {
+  font-size: 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.fs-curated {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 10px;
+  margin-top: 10px;
+  color: var(--yellow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.fs-curated::before { content: '»'; font-size: 14px; }
+
+/* === Route Detail === */
+.route-detail-hero {
+  margin: 0 20px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  position: relative;
+}
+.route-detail-hero .tier {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.route-detail-hero h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.route-detail-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.rd-stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.rd-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+  line-height: 1;
+}
+.route-section {
+  margin: 0 20px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.route-section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  font-weight: 700;
+}
+.route-section-text {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 8px;
+  color: var(--text);
+}
+.route-section ul {
+  list-style: none;
+  margin-top: 10px;
+}
+.route-section li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  margin-bottom: 6px;
+}
+.route-section li::before {
+  content: '»';
+  position: absolute;
+  left: 0;
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+/* === Fahrschule === */
+.fs-stats {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.fs-stat-box {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+}
+.fs-stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.fs-stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: -0.02em;
+  color: var(--yellow);
+  line-height: 1;
+}
+
+.fs-skill {
+  margin-top: 18px;
+  padding: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.fs-skill-row { margin-top: 12px; }
+.fs-skill-row:first-of-type { margin-top: 10px; }
+.fs-skill-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.fs-skill-head .name { font-weight: 600; color: var(--text); }
+.fs-skill-head .status {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.fs-skill-head .status.good { color: var(--green-ok); }
+.fs-skill-head .status.ok { color: var(--yellow); }
+.fs-skill-head .status.bad { color: var(--red-alert); }
+.fs-skill-bar {
+  height: 4px;
+  background: var(--bg-elev);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.fs-skill-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+
+/* Roadmap (Pflicht-Checkliste) */
+.roadmap-card {
+  margin: 0 20px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+}
+.roadmap-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  font-weight: 700;
+}
+.roadmap-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 6px;
+  letter-spacing: -0.01em;
+}
+.roadmap-list {
+  margin-top: 18px;
+}
+.roadmap-item {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--line);
+  align-items: flex-start;
+}
+.roadmap-item:last-child { border-bottom: none; }
+.roadmap-status {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.roadmap-status.done { background: var(--green-ok); color: var(--bg); }
+.roadmap-status.active { background: var(--yellow); color: var(--bg); animation: pulse 2s infinite; }
+.roadmap-status.todo { background: var(--bg); color: var(--text-muted); border: 1px solid var(--line-bright); font-size: 11px; }
+.roadmap-body { flex: 1; }
+.roadmap-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.roadmap-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  letter-spacing: 0.03em;
+}
+.roadmap-detail {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* === Tab Bar === */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(28, 28, 28, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--line);
+  padding: 14px 0 28px;
+  display: flex;
+  justify-content: space-around;
+  z-index: 50;
+}
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+.tab.active { color: var(--yellow); }
+.tab.active .tab-icon { background: var(--yellow); color: var(--bg); }
+.tab-icon {
+  width: 38px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--bg-elev);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s;
+  color: var(--text-soft);
+}
+
+/* === Pitch panel === */
+.pitch-panel {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  width: 320px;
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  padding: 24px;
+  color: #1a1a1a;
+  z-index: 2;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+.pitch-panel .eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #c4a800;
+  font-weight: 700;
+}
+.pitch-panel h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 8px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.pitch-points {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pitch-point {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #555;
+}
+.pitch-point .num {
+  font-family: var(--mono);
+  color: #c4a800;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 11px;
+  padding-top: 2px;
+}
+.pitch-point strong { color: #1a1a1a; font-weight: 600; }
+
+@media (max-width: 1100px) {
+  .frame-context, .pitch-panel, .pitch-hint { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="frame-wrapper">
+  
+  <div class="frame-context">
+    <div class="logo">Pitch · Beifahrer</div>
+    <h1>Wenn ab 2027 Eltern Fahrlehrer sind, brauchen sie <em>einen Beifahrer.</em></h1>
+    <p>Eine Mini-Demo. Drei Module. Ein Gesamtsystem. Single-File HTML — läuft offline, kein Backend.</p>
+  </div>
+
+  <div class="pitch-panel">
+    <div class="eyebrow">Warum jetzt</div>
+    <h2>Drei Module, ein Ökosystem</h2>
+    <div class="pitch-points">
+      <div class="pitch-point">
+        <span class="num">01</span>
+        <div><strong>Co-Pilot.</strong> Coaching-Briefings für die Begleitperson vor jeder Fahrt. Strukturiertes Debriefing danach. Genau das, was Politik und TÜV fordern.</div>
+      </div>
+      <div class="pitch-point">
+        <span class="num">02</span>
+        <div><strong>Refresher.</strong> Theorie-Auffrischung für Begleitende. Niemand bedient diese Zielgruppe heute.</div>
+      </div>
+      <div class="pitch-point">
+        <span class="num">03</span>
+        <div><strong>Mein Übungsweg.</strong> Lokale Streckenkarte – kuratiert durch euch. Der White-Label-Hebel.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pitch-hint">
+    Tippe durch die Tabs unten. Die Demo ist <b>komplett klickbar</b>. Inhalte: fachlich recherchiert, Strecken: plausibel für Albstadt.
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="status-bar">
+      <span>9:24</span>
+      <span class="icons">
+        <span>·····</span>
+        <span>📶</span>
+        <span>🔋</span>
+      </span>
+    </div>
+
+    <div class="screen" id="screen">
+
+      <!-- All views injected by JS -->
+
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <div class="tab active" data-tab="home" onclick="goto('home')">
+        <div class="tab-icon">⌂</div>
+        Start
+      </div>
+      <div class="tab" data-tab="drive" onclick="goto('drive')">
+        <div class="tab-icon">→</div>
+        Fahren
+      </div>
+      <div class="tab" data-tab="learn" onclick="goto('learn')">
+        <div class="tab-icon">i</div>
+        Refresher
+      </div>
+      <div class="tab" data-tab="routes" onclick="goto('routes')">
+        <div class="tab-icon">∞</div>
+        Strecken
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// =========================================================================
+// DATA LAYER — alle Inhalte als JSON, sauber separiert
+// =========================================================================
+
+const STATE = {
+  user: {
+    name: 'Mia',
+    begleiter: ['Papa', 'Oma Inge'],
+    fahrschule: 'move by berthele',
+    ort: 'Albstadt'
+  },
+  fortschritt: {
+    kmGefahren: 342,
+    kmZiel: 1000,
+    fahrten: 28,
+    sechsPflichtstundenAbgeschlossen: 6,
+    theoriePruefungBestanden: true
+  },
+  // Aktueller Quiz-State
+  quiz: {
+    activeThema: null,
+    aktuelleFrage: 0,
+    antworten: []
+  }
+};
+
+// =========================================================================
+// COACHING-THEMEN für die Begleitperson
+// Fachlich orientiert an gängiger Fahrlehrer-Didaktik
+// =========================================================================
+const COACHING_THEMEN = {
+  'autobahnauffahrt': {
+    name: 'Autobahnauffahrt',
+    tipp: 'Lass den Bewerber selbst entscheiden, wann er einfädelt. Greife verbal nur ein, wenn die Sicherheit gefährdet ist.',
+    schritte: [
+      'Frühzeitig auf den linken Spiegel und Schulterblick achten — die Lücke muss erkannt werden, bevor der Beschleunigungsstreifen kurz wird',
+      'Auf dem Beschleunigungsstreifen auf die Geschwindigkeit der durchgehenden Fahrspur beschleunigen — nicht langsamer einfädeln',
+      'Blinker links setzen, sobald die Absicht zum Einfädeln besteht',
+      'Bei voller Spur: notfalls bremsen und am Ende des Streifens neu einordnen, aber niemals stehen bleiben'
+    ],
+    nachher: 'War das Beschleunigen auf Tempo gelungen oder hat der Bewerber zu zögerlich gefahren? Wie war die Wahl der Lücke?'
+  },
+  'kreisverkehr': {
+    name: 'Kreisverkehr',
+    tipp: 'Der Klassiker, an dem fast jeder Bewerber zu Beginn falsch blinkt. Bleib geduldig — die Regel ist nicht intuitiv.',
+    schritte: [
+      'Beim Einfahren in den Kreisverkehr darf NICHT geblinkt werden (§ 8 Abs. 1a StVO)',
+      'Fahrzeuge im Kreis haben Vorfahrt — beim Annähern Tempo deutlich reduzieren',
+      'Im Kreis selbst: kein Blinker, ruhig durchfahren',
+      'Beim Verlassen rechts blinken — direkt vor der Ausfahrt, nicht früher',
+      'Auf querende Radfahrer und Fußgänger an der Ausfahrt achten (§ 9 Abs. 3 StVO)'
+    ],
+    nachher: 'Wurde beim Einfahren korrekt nicht geblinkt? Beim Ausfahren rechtzeitig? Wie war das Tempo?'
+  },
+  'spurwechsel': {
+    name: 'Spurwechsel',
+    tipp: 'Der häufigste Anfängerfehler: zu sehr auf den Spiegel verlassen, Schulterblick vergessen. Sag das ruhig immer wieder.',
+    schritte: [
+      'Innenspiegel → Außenspiegel → Blinker → Schulterblick → Wechsel. In dieser Reihenfolge.',
+      'Schulterblick ist nicht optional. Spiegel haben einen toten Winkel — das übersieht jeder Anfänger',
+      'Erst blinken, dann ein paar Sekunden warten, dann wechseln — nicht gleichzeitig',
+      'Nach dem Wechsel: Blinker ausschalten (machen viele nicht)',
+      'Niemals rechts überholen (§ 5 StVO) — Ausnahme: stehender Verkehr auf der linken Spur'
+    ],
+    nachher: 'War der Schulterblick deutlich erkennbar? War der Abstand zum nachfolgenden Fahrzeug ausreichend?'
+  },
+  'einparken': {
+    name: 'Einparken längs',
+    tipp: 'Hier ist Geduld der Schlüssel. Lass dir keine 30 Sekunden den Pulver geben — auch im Verkehr nicht. Lieber ein Wagen wartet, als dass der Bewerber in Stress kommt.',
+    schritte: [
+      'Parklücke aussuchen: mindestens 1,2× Fahrzeuglänge',
+      'Auf gleicher Höhe wie das vordere Fahrzeug stehen bleiben, ca. 50 cm Seitenabstand',
+      'Rückwärtsgang, langsam zurück, lenken sobald die hintere Stoßstange des vorderen Autos in der Mitte des Beifahrerfensters ist',
+      'Wenn das Heck im 45°-Winkel zur Bordsteinkante steht: Lenkrad gegenläufig drehen',
+      'Vor- und zurück, bis das Auto parallel zum Bordstein steht — Abstand ca. 30 cm'
+    ],
+    nachher: 'Wurde rundum geschaut (auch beim Rangieren)? War die Lenkung ruhig oder hektisch?'
+  },
+  'schulterblick': {
+    name: 'Schulterblick',
+    tipp: 'Der toten Winkel ist der häufigste Unfallgrund für Anfänger. Bleib hartnäckig — auch wenn der Bewerber sagt "ich hab geschaut".',
+    schritte: [
+      'Vor JEDEM Spurwechsel: über die Schulter in den toten Winkel',
+      'Beim Abbiegen an Kreuzungen: Schulterblick zur Seite, in die abgebogen wird',
+      'Beim Anfahren vom Fahrbahnrand: Schulterblick nach links',
+      'Beim Rechtsabbiegen: zusätzlich auf Radfahrer rechts achten',
+      'Der Schulterblick darf nicht zu lange dauern — geübt: 1-2 Sekunden'
+    ],
+    nachher: 'War der Schulterblick deutlich erkennbar (Kopfbewegung sichtbar)? Wurde er bei allen Situationen gemacht?'
+  },
+  'anfahren': {
+    name: 'Anfahren am Berg',
+    tipp: 'Die meisten modernen Autos haben einen Berganfahrassistenten. Trotzdem muss das ohne geübt werden — die Prüfung ist meistens mit einem Schaltwagen.',
+    schritte: [
+      'Handbremse ziehen — auch wenn der Berganfahrassistent vorhanden ist (Sicherheit)',
+      'Kupplung kommen lassen bis zum Schleifpunkt — das Auto "drückt" leicht',
+      'Gleichzeitig: Handbremse lösen, Gas vorsichtig dazugeben',
+      'Bei Automatik: Bremspedal lösen, Gas geben — der Berganfahrassistent hält das Auto für 2-3 Sekunden',
+      'Wichtig: nicht ruckartig anfahren, der Motor darf nicht abgewürgt werden'
+    ],
+    nachher: 'Wurde das Auto sicher gehalten oder ist es zurückgerollt? War das Anfahren ruckartig?'
+  }
+};
+
+// =========================================================================
+// THEORIE-REFRESHER — fachlich korrekte Themen für Begleitperson
+// Quellen: StVO (dejure.org), ADAC, BMV, Bußgeldkatalog 2026
+// =========================================================================
+const REFRESHER_THEMEN = [
+  {
+    id: 'rettungsgasse',
+    name: 'Rettungsgasse',
+    meta: '4 Fragen · seit 2017 neu geregelt',
+    status: 'new',
+    intro: 'Seit Dezember 2016 ist die Regel klar definiert: Die Rettungsgasse bildet sich IMMER zwischen dem ganz linken und dem unmittelbar rechts daneben liegenden Fahrstreifen — egal wie viele Spuren es gibt. Davor galt bei vier Spuren noch eine andere Regelung.',
+    fragen: [
+      {
+        text: 'Wo wird die Rettungsgasse gebildet, wenn drei Fahrstreifen in eine Richtung führen?',
+        kontext: 'Seit 2017 ist die Regel klar definiert. Wichtig: nicht erst bei Stau, sondern schon bei stockendem Verkehr (Schrittgeschwindigkeit).',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Zwischen mittlerem und rechtem Fahrstreifen', korrekt: false },
+          { text: 'Zwischen linkem und mittlerem Fahrstreifen', korrekt: true },
+          { text: 'Immer auf dem Standstreifen', korrekt: false }
+        ],
+        erklaerung: 'Nach § 11 Abs. 2 StVO bildet sich die Rettungsgasse immer "zwischen dem äußerst linken und dem unmittelbar rechts daneben liegenden Fahrstreifen". Bei 3 Spuren also zwischen Spur 1 und Spur 2.',
+        paragraph: '§ 11 Abs. 2 StVO'
+      },
+      {
+        text: 'Ab wann muss eine Rettungsgasse gebildet werden?',
+        kontext: 'Viele warten zu lange, bis das Rettungsfahrzeug schon zu sehen ist. Die Regel ist anders.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Sobald ein Rettungsfahrzeug mit Blaulicht erkennbar ist', korrekt: false },
+          { text: 'Sobald Fahrzeuge mit Schrittgeschwindigkeit fahren oder stehen', korrekt: true },
+          { text: 'Nur bei einem Unfall auf der Autobahn', korrekt: false }
+        ],
+        erklaerung: 'Die Rettungsgasse muss bereits gebildet werden, sobald die Fahrzeuge auf Autobahnen oder Außerortsstraßen mit mindestens 2 Fahrstreifen mit Schrittgeschwindigkeit fahren oder stehen — nicht erst, wenn das Rettungsfahrzeug kommt. Hintergrund: Im Notfall zählt jede Sekunde.',
+        paragraph: '§ 11 Abs. 2 StVO'
+      },
+      {
+        text: 'Wo bildet sich die Rettungsgasse bei 4 Fahrstreifen pro Richtung?',
+        kontext: 'Vorsicht: Bis 2016 galt hier noch "in der Mitte" — das ist seitdem geändert.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'In der Mitte zwischen Spur 2 und Spur 3', korrekt: false },
+          { text: 'Zwischen Spur 1 (ganz links) und Spur 2', korrekt: true },
+          { text: 'Zwischen Spur 3 und Spur 4', korrekt: false }
+        ],
+        erklaerung: 'Auch bei 4 Spuren bildet sich die Rettungsgasse zwischen dem ganz linken Fahrstreifen und dem unmittelbar rechts daneben liegenden. Die alte Regel ("in der Mitte") wurde 2016 abgeschafft, weil sie bei 4 Spuren mehrdeutig war.',
+        paragraph: '§ 11 Abs. 2 StVO (Fassung seit 14.12.2016)'
+      },
+      {
+        text: 'Welche Strafe droht bei Nichtbildung der Rettungsgasse?',
+        kontext: 'Die Bußgelder wurden 2020 deutlich erhöht.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: '50 Euro Verwarngeld', korrekt: false },
+          { text: 'Mindestens 200 Euro, 2 Punkte und 1 Monat Fahrverbot', korrekt: true },
+          { text: 'Nur eine Verwarnung ohne Bußgeld', korrekt: false }
+        ],
+        erklaerung: 'Seit der Bußgeldkatalog-Reform 2020 kostet das Nichtbilden mindestens 200 Euro, gibt 2 Punkte in Flensburg und ein Monat Fahrverbot. Bei Behinderung von Einsatzfahrzeugen kann das Bußgeld auf 320 Euro steigen.',
+        paragraph: 'Bußgeldkatalog 2020/2026'
+      }
+    ]
+  },
+  {
+    id: 'reissverschluss',
+    name: 'Reißverschluss-Regel',
+    meta: '3 Fragen · Verhalten in Engstellen',
+    status: 'new',
+    intro: 'Das Reißverschlussverfahren ist in § 7 Abs. 4 StVO geregelt. Es funktioniert nur, wenn alle es richtig anwenden — und es betrifft NUR endende Fahrstreifen und Engstellen, nicht das Auffahren auf die Autobahn.',
+    fragen: [
+      {
+        text: 'Wann genau muss man sich beim Reißverschlussverfahren einordnen?',
+        kontext: 'Der typische Anfängerfehler: zu früh wechseln. Die StVO sagt etwas anderes.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Sobald das Schild "verengte Fahrbahn" steht', korrekt: false },
+          { text: 'Unmittelbar vor Beginn der Verengung', korrekt: true },
+          { text: 'Schon einen Kilometer vorher, um Stau zu vermeiden', korrekt: false }
+        ],
+        erklaerung: 'Nach § 7 Abs. 4 StVO ordnen sich Fahrzeuge "unmittelbar vor Beginn der Verengung" ein. Wer zu früh wechselt, verlängert den Stau — die Spur soll bis zum Ende genutzt werden. Das ist gewollt, nicht "Drängeln".',
+        paragraph: '§ 7 Abs. 4 StVO'
+      },
+      {
+        text: 'Gilt das Reißverschlussverfahren beim Auffahren auf die Autobahn?',
+        kontext: 'Häufige Verwechslung. Die Regelung ist hier eine andere.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Ja, jeder muss eine Lücke lassen', korrekt: false },
+          { text: 'Nein, der Auffahrende muss sich selbst eine Lücke suchen', korrekt: true },
+          { text: 'Nur bei Stau auf der Autobahn', korrekt: false }
+        ],
+        erklaerung: 'Beim Auffahren auf die Autobahn gilt KEIN Reißverschlussverfahren. Der Auffahrende muss den durchgehenden Verkehr (der Vorfahrt hat) beachten und sich selbst einfädeln. Das Reißverschlussverfahren gilt nur bei endenden Fahrstreifen und Baustellen.',
+        paragraph: '§ 7 Abs. 4 StVO + § 18 StVO'
+      },
+      {
+        text: 'Was droht, wenn man Fahrer von der endenden Spur nicht einordnen lässt?',
+        kontext: 'Das ist eine echte Ordnungswidrigkeit — viele wissen das nicht.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Nichts — wer rechts fährt, hat Vorfahrt', korrekt: false },
+          { text: 'Verwarngeld von 20 Euro', korrekt: true },
+          { text: '100 Euro Bußgeld und 1 Punkt', korrekt: false }
+        ],
+        erklaerung: 'Wer einen Fahrer beim Reißverschluss nicht reinlässt, riskiert ein Verwarngeld von 20 Euro. Bei vorsätzlicher Verhinderung kann es als Nötigung gewertet werden — das ist eine Straftat.',
+        paragraph: 'Bußgeldkatalog · § 7 Abs. 4 StVO'
+      }
+    ]
+  },
+  {
+    id: 'kreisverkehr',
+    name: 'Vorrang im Kreisverkehr',
+    meta: '5 Fragen · was sich geändert hat',
+    status: 'done',
+    intro: 'Der Kreisverkehr ist seit 2001 einheitlich in § 8 Abs. 1a StVO geregelt. Wichtig ist das Verkehrszeichen 215 in Kombination mit Zeichen 205 ("Vorfahrt gewähren") — ohne diese Schilder gilt rechts vor links.',
+    fragen: [
+      {
+        text: 'Muss man beim Einfahren in den Kreisverkehr blinken?',
+        kontext: 'Die häufigste Fehleinschätzung. Die Regel ist seit 2001 klar.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Ja, immer rechts blinken', korrekt: false },
+          { text: 'Nein, beim Einfahren NICHT blinken', korrekt: true },
+          { text: 'Nur bei mehrspurigen Kreiseln', korrekt: false }
+        ],
+        erklaerung: 'Nach § 8 Abs. 1a Satz 2 StVO darf beim Einfahren in den Kreisverkehr nicht geblinkt werden. Hintergrund: Blinken würde andere Verkehrsteilnehmer irritieren — sie könnten denken, das einfahrende Fahrzeug fährt sofort wieder raus.',
+        paragraph: '§ 8 Abs. 1a Satz 2 StVO'
+      },
+      {
+        text: 'Wann muss im Kreisverkehr geblinkt werden?',
+        kontext: 'Hier ist der Blinker Pflicht.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Beim Einfahren', korrekt: false },
+          { text: 'Beim Verlassen (Ausfahren)', korrekt: true },
+          { text: 'Beim Wechsel der Fahrspur im mehrspurigen Kreisel', korrekt: false }
+        ],
+        erklaerung: 'Beim Verlassen des Kreisverkehrs muss rechts geblinkt werden — das Ausfahren kommt einem Abbiegen gleich (§ 9 Abs. 1 StVO). Wer nicht blinkt, riskiert 10 Euro Verwarngeld und gefährdet besonders Radfahrer und Fußgänger.',
+        paragraph: '§ 9 Abs. 1 StVO'
+      },
+      {
+        text: 'Wer hat Vorfahrt am Kreisverkehr mit Zeichen 215?',
+        kontext: 'Wichtig: Es kommt auf die Kombination der Schilder an.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Der Einfahrende — wie bei einer normalen Kreuzung', korrekt: false },
+          { text: 'Der Verkehr im Kreis hat Vorfahrt', korrekt: true },
+          { text: 'Es gilt rechts vor links', korrekt: false }
+        ],
+        erklaerung: 'Wenn an der Einmündung das Zeichen 215 (Kreisverkehr) UND das Zeichen 205 ("Vorfahrt gewähren") angebracht sind, hat der Verkehr im Kreis Vorfahrt. Ohne diese Schilder gilt eine normale Kreuzung mit rechts vor links.',
+        paragraph: '§ 8 Abs. 1a StVO + Zeichen 215, 205'
+      },
+      {
+        text: 'Wer hat Vorrang beim Verlassen des Kreisverkehrs gegenüber einem Radfahrer, der den Kreisverkehr auf dem Radweg umfährt?',
+        kontext: 'Das wissen viele Autofahrer nicht — gefährlich für Radfahrer.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Das Auto, weil es aus dem Kreisverkehr kommt', korrekt: false },
+          { text: 'Der Radfahrer auf dem Radweg', korrekt: true },
+          { text: 'Es gilt rechts vor links', korrekt: false }
+        ],
+        erklaerung: 'Nach § 9 Abs. 3 StVO hat der Radfahrer auf dem geradeaus weiterführenden Radweg Vorrang. Das Auto, das den Kreisverkehr verlässt, ist quasi ein Abbieger — und muss dem Radfahrer Vorfahrt gewähren.',
+        paragraph: '§ 9 Abs. 3 StVO'
+      },
+      {
+        text: 'Darf man im Kreisverkehr anhalten oder parken?',
+        kontext: 'Eine klare Regel — und meistens missverstanden.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Ja, kurz zum Aussteigen lassen ist erlaubt', korrekt: false },
+          { text: 'Nein — Halten und Parken sind verboten', korrekt: true },
+          { text: 'Nur am Rand der Kreisfahrbahn', korrekt: false }
+        ],
+        erklaerung: 'Im Kreisverkehr ist das Halten und Parken verboten (siehe Erläuterung zu Zeichen 215). Hintergrund: Schon kurzes Halten kann zum Stau führen, da Nachfolgende nicht einfach ausweichen können.',
+        paragraph: 'Erläuterung zu Zeichen 215'
+      }
+    ]
+  },
+  {
+    id: 'handy',
+    name: 'Handy am Steuer',
+    meta: '3 Fragen · aktuelle Bußgelder',
+    status: 'done',
+    intro: 'Das Handyverbot in § 23 Abs. 1a StVO wurde 2017 deutlich verschärft. Es betrifft nicht nur Mobiltelefone, sondern alle "elektronischen Geräte zur Kommunikation, Information oder Organisation". Die Rechtsprechung hat den Begriff "Halten" sehr weit ausgelegt.',
+    fragen: [
+      {
+        text: 'Ist es erlaubt, das Handy zwischen Ohr und Schulter zu klemmen und so zu telefonieren?',
+        kontext: 'Ein Gericht hat dazu klar entschieden.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Ja, weil die Hände frei sind', korrekt: false },
+          { text: 'Nein, das ist genauso verboten wie "in der Hand halten"', korrekt: true },
+          { text: 'Nur bei stehendem Fahrzeug erlaubt', korrekt: false }
+        ],
+        erklaerung: 'Das OLG Köln hat 2020 klargestellt: Wer das Handy zwischen Ohr und Schulter klemmt, "hält" es im Sinne des § 23 Abs. 1a StVO. Der Fahrer ist in dieser Haltung nicht in der Lage, das Fahrzeug ordnungsgemäß zu bedienen.',
+        paragraph: '§ 23 Abs. 1a StVO · OLG Köln Az. 1 RBs 347/20'
+      },
+      {
+        text: 'Welches Bußgeld droht für die Nutzung des Handys am Steuer?',
+        kontext: 'Die Strafen wurden 2017 deutlich erhöht.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: '50 Euro Verwarngeld', korrekt: false },
+          { text: '100 Euro Bußgeld und 1 Punkt in Flensburg', korrekt: true },
+          { text: '500 Euro und sofortiger Führerscheinentzug', korrekt: false }
+        ],
+        erklaerung: 'Der Standardverstoß kostet 100 Euro plus 1 Punkt. Bei Gefährdung: 150 Euro, 2 Punkte und 1 Monat Fahrverbot. Bei Sachbeschädigung: 200 Euro, 2 Punkte und 1 Monat Fahrverbot. Für Fahranfänger zusätzlich: A-Verstoß mit verlängerter Probezeit und Aufbauseminar.',
+        paragraph: '§ 23 Abs. 1a StVO · Bußgeldkatalog 2026'
+      },
+      {
+        text: 'Darf man das Handy nutzen, wenn der Motor an einer Ampel ausgeschaltet ist?',
+        kontext: 'Hier gibt es eine wichtige Ausnahme — aber sie ist enger, als viele denken.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Ja, wenn der Motor wirklich aus ist (nicht Start-Stopp)', korrekt: true },
+          { text: 'Nein, generell verboten beim Fahrzeugführen', korrekt: false },
+          { text: 'Nur bei einer Rot-Phase über 60 Sekunden', korrekt: false }
+        ],
+        erklaerung: 'Die Ausnahme greift nur, wenn der Motor wirklich ausgeschaltet ist. Bei moderner Start-Stopp-Automatik gilt der Motor NICHT als ausgeschaltet — das hat das OLG Karlsruhe entschieden. Wer also an der Ampel mit Start-Stopp-Funktion das Handy nimmt, begeht eine Ordnungswidrigkeit.',
+        paragraph: '§ 23 Abs. 1a StVO · OLG Karlsruhe'
+      }
+    ]
+  },
+  {
+    id: 'assistenz',
+    name: 'Assistenzsysteme verstehen',
+    meta: '6 Fragen · Spurhalter, Notbremse, ESP',
+    status: 'todo',
+    intro: 'Moderne Autos haben viele Helfer — aber sie sind kein Autopilot. Als Begleitperson solltest du wissen, was sie können und was nicht, damit du den Bewerber richtig coachen kannst.',
+    fragen: [
+      {
+        text: 'Was macht ein Spurhalteassistent?',
+        kontext: 'Wichtige Unterscheidung: warnen vs. lenken.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Er übernimmt die Lenkung komplett', korrekt: false },
+          { text: 'Er warnt oder korrigiert leicht, wenn die Spur ohne Blinker verlassen wird', korrekt: true },
+          { text: 'Er bremst ab, wenn die Spur verlassen wird', korrekt: false }
+        ],
+        erklaerung: 'Spurhalteassistenten warnen optisch/akustisch und greifen je nach System leicht in die Lenkung ein. Sie ersetzen NICHT den Fahrer. Bei aktivem Blinker werden die Systeme deaktiviert, weil das System dann von gewolltem Spurwechsel ausgeht.',
+        paragraph: ''
+      },
+      {
+        text: 'Wann reagiert ein Notbremsassistent (AEB)?',
+        kontext: 'Pflicht in Neufahrzeugen seit Juli 2024 (UN-R 152).',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Bei jedem Bremsmanöver des Fahrers', korrekt: false },
+          { text: 'Wenn eine Kollision droht und der Fahrer nicht reagiert', korrekt: true },
+          { text: 'Nur bei eingeschalteter Funktion durch den Fahrer', korrekt: false }
+        ],
+        erklaerung: 'Der Notbremsassistent löst eine automatische Notbremsung aus, wenn Sensoren eine drohende Kollision erkennen und der Fahrer nicht rechtzeitig reagiert. In Neufahrzeugen seit 7/2024 Pflicht. WICHTIG: Er kann nicht alle Situationen erkennen — der Fahrer bleibt verantwortlich.',
+        paragraph: 'UN-R 152'
+      },
+      {
+        text: 'Was bedeutet ESP genau?',
+        kontext: 'Pflicht in allen Neufahrzeugen seit 2014.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Elektronisches Stabilitäts-Programm', korrekt: true },
+          { text: 'Elektrisches Schub-Programm', korrekt: false },
+          { text: 'Externe Sicherheits-Pufferung', korrekt: false }
+        ],
+        erklaerung: 'ESP (Elektronisches Stabilitäts-Programm) bremst gezielt einzelne Räder ab, wenn das Auto auszubrechen droht. Es verhindert insbesondere Schleudern bei Glätte oder schnellen Ausweichmanövern. Seit 2014 Pflicht in allen neuen Pkw — eine der wirksamsten Sicherheitstechnologien überhaupt.',
+        paragraph: ''
+      },
+      {
+        text: 'Was sollte der Bewerber tun, wenn der Notbremsassistent eine Falschauslösung verursacht?',
+        kontext: 'Kommt selten vor, aber kann passieren — z.B. bei reflektierenden Schildern.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Sofort kräftig auf das Gaspedal treten', korrekt: false },
+          { text: 'Ruhig bleiben, die Notbremse zu Ende laufen lassen, dann normal weiterfahren', korrekt: true },
+          { text: 'Den Schlüssel umdrehen, um das System neu zu starten', korrekt: false }
+        ],
+        erklaerung: 'Bei einer (seltenen) Falschauslösung sollte der Fahrer ruhig bleiben und die Bremsung zu Ende laufen lassen. Niemals beschleunigen — das könnte einen Auffahrunfall verursachen. Nach kurzer Zeit lässt das System los und man kann normal weiterfahren.',
+        paragraph: ''
+      },
+      {
+        text: 'Erlaubt der Tempomat (Geschwindigkeitsregelanlage), die Hände vom Lenkrad zu nehmen?',
+        kontext: 'Wichtige Unterscheidung zwischen Tempomat und (teil-)autonomem Fahren.',
+        sicherheitsrelevant: true,
+        antworten: [
+          { text: 'Ja, der Tempomat steuert das Auto vollständig', korrekt: false },
+          { text: 'Nein, der Tempomat regelt nur die Geschwindigkeit, nicht die Lenkung', korrekt: true },
+          { text: 'Nur auf der Autobahn', korrekt: false }
+        ],
+        erklaerung: 'Ein klassischer Tempomat hält nur die Geschwindigkeit. Der Fahrer muss weiterhin lenken und die volle Aufmerksamkeit haben. Auch bei adaptivem Tempomat (ACC) und Spurhalter zusammen handelt es sich um Assistenzsysteme nach SAE Level 2 — der Fahrer trägt jederzeit die Verantwortung.',
+        paragraph: ''
+      },
+      {
+        text: 'Wann sollte man Assistenzsysteme bewusst deaktivieren?',
+        kontext: 'Es gibt Situationen, in denen sie mehr stören als helfen.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Nie — sie sind immer hilfreich', korrekt: false },
+          { text: 'Bei sehr engen Baustellen oder unklarer Fahrbahnmarkierung kann der Spurhalter stören', korrekt: true },
+          { text: 'Immer in der Stadt', korrekt: false }
+        ],
+        erklaerung: 'Bei sehr engen Baustellen oder verblassten Fahrbahnmarkierungen können Spurhalteassistenten falsche Korrekturen vornehmen. Erfahrene Fahrer schalten sie dann zeitweise ab. Notbremsassistent und ESP sollte man nie deaktivieren — sie greifen nur im Notfall ein.',
+        paragraph: ''
+      }
+    ]
+  },
+  {
+    id: 'umweltzonen',
+    name: 'Umweltzonen & Plaketten',
+    meta: '2 Fragen · in deiner Region',
+    status: 'todo',
+    intro: 'Umweltzonen gibt es in vielen deutschen Städten seit 2008. In jede Umweltzone darf nur einfahren, wer eine entsprechende Plakette hat. Die Region Albstadt selbst hat keine Umweltzone — aber Tübingen, Reutlingen und Stuttgart schon.',
+    fragen: [
+      {
+        text: 'Welche Plakette ist aktuell für die meisten Umweltzonen vorgeschrieben?',
+        kontext: 'Es gab eine Entwicklung von rot über gelb zu grün.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Rote Plakette', korrekt: false },
+          { text: 'Grüne Plakette (Schadstoffgruppe 4)', korrekt: true },
+          { text: 'Gelbe Plakette', korrekt: false }
+        ],
+        erklaerung: 'In den meisten deutschen Umweltzonen ist heute nur noch die grüne Plakette (Schadstoffgruppe 4) zulässig. Rote und gelbe Plaketten dürfen in den meisten Zonen nicht mehr einfahren. Bei Verstoß: 100 Euro Bußgeld.',
+        paragraph: '35. BImSchV'
+      },
+      {
+        text: 'Welche Stadt in deiner Nähe hat eine Umweltzone?',
+        kontext: 'Speziell für die Region Albstadt/Zollernalbkreis relevant.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Albstadt', korrekt: false },
+          { text: 'Tübingen, Reutlingen und Stuttgart', korrekt: true },
+          { text: 'Sigmaringen', korrekt: false }
+        ],
+        erklaerung: 'In Albstadt selbst gibt es keine Umweltzone. Aber sobald der Bewerber Richtung Tübingen, Reutlingen oder Stuttgart fährt, ist eine grüne Plakette nötig. Wichtig zu wissen für die ersten weiten Fahrten Richtung Tübingen (B27) und Stuttgart (A8).',
+        paragraph: ''
+      }
+    ]
+  },
+  {
+    id: 'tempolimits',
+    name: 'Tempolimits korrekt lesen',
+    meta: '4 Fragen · neue Beschilderung',
+    status: 'todo',
+    intro: 'Tempolimits sind eigentlich einfach — bis zu dem Moment, wo sie sich wieder aufheben. Hier helfen ein paar klare Regeln zur Aufhebung und zum Streckenverbot.',
+    fragen: [
+      {
+        text: 'Wo endet ein durch Schild verordnetes Tempolimit auf der Landstraße automatisch?',
+        kontext: 'Häufig falsch verstanden.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Nach 200 Metern', korrekt: false },
+          { text: 'An der nächsten Kreuzung oder durch ein Aufhebungszeichen', korrekt: true },
+          { text: 'Es gilt bis zum Ortsausgang', korrekt: false }
+        ],
+        erklaerung: 'Außerhalb von Ortschaften endet ein Tempolimit an der nächsten Kreuzung oder Einmündung — oder durch ein explizites Aufhebungszeichen (Zeichen 278). Innerorts gilt es bis zum Ortsausgangsschild oder bis zur Aufhebung.',
+        paragraph: 'StVO Anlage 2'
+      },
+      {
+        text: 'Was bedeutet das Zeichen 274.1 (Beginn einer "Tempo-30-Zone")?',
+        kontext: 'Unterschied zum einzelnen Tempo-30-Schild.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Tempo 30 für 100 Meter', korrekt: false },
+          { text: 'Tempo 30 für ein ganzes Gebiet, bis das Ende-Zeichen kommt', korrekt: true },
+          { text: 'Tempo 30 nur tagsüber', korrekt: false }
+        ],
+        erklaerung: 'Eine "Tempo-30-Zone" gilt flächig für ein ganzes Wohngebiet bis zum entsprechenden Aufhebungszeichen 274.2. Innerhalb der Zone gilt ZUSÄTZLICH rechts vor links — auch ohne weitere Beschilderung. Wichtig: einzelne Tempo-30-Schilder gelten nur für die jeweilige Straße, nicht flächig.',
+        paragraph: 'Zeichen 274.1 / 274.2'
+      },
+      {
+        text: 'Welche Geschwindigkeit gilt innerorts ohne Schild?',
+        kontext: 'Standardwissen — aber wichtig zu wissen, wann es weniger ist.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: '30 km/h', korrekt: false },
+          { text: '50 km/h', korrekt: true },
+          { text: '60 km/h', korrekt: false }
+        ],
+        erklaerung: 'Innerorts gilt 50 km/h, sobald das Ortsschild Zeichen 310 erreicht ist. Bei verkehrsberuhigten Bereichen (Zeichen 325.1) gilt Schrittgeschwindigkeit (ca. 7 km/h). Spielstraßen sind also DEUTLICH langsamer als normale Wohngebiete.',
+        paragraph: '§ 3 Abs. 3 StVO'
+      },
+      {
+        text: 'Welche zulässige Höchstgeschwindigkeit gilt für Fahranfänger in der Probezeit?',
+        kontext: 'Wichtig zu wissen, ohne Sondervorschrift gibt es keine.',
+        sicherheitsrelevant: false,
+        antworten: [
+          { text: 'Maximal 80 km/h auf der Autobahn', korrekt: false },
+          { text: 'Die gleichen Limits wie für alle anderen', korrekt: true },
+          { text: 'Maximal 100 km/h überall', korrekt: false }
+        ],
+        erklaerung: 'In Deutschland gilt für Fahranfänger in der Probezeit KEINE generelle Geschwindigkeitsbeschränkung — anders als z.B. in Österreich (100 km/h in den ersten Jahren). Allerdings gilt das Alkohol-Null-Promille-Verbot bis 21 Jahre oder bis zum Ende der Probezeit.',
+        paragraph: '§ 24c StVG'
+      }
+    ]
+  }
+];
+
+// =========================================================================
+// LOKALE STRECKEN — Albstadt-Region, plausibel und didaktisch sortiert
+// =========================================================================
+const STRECKEN = [
+  {
+    id: 'lautlingen-wohn',
+    name: 'Wohngebiet Lautlingen',
+    tier: 'beginner',
+    tierLabel: 'Anfänger',
+    km: 4.2,
+    dauer: 15,
+    kurzInfo: 'Tempo 30',
+    tags: ['Wenig Verkehr', 'Tempo 30', 'Parkübungen'],
+    kuratiert: true,
+    beschreibung: 'Ruhige Wohnstraßen in Lautlingen, ideal für die ersten Fahrversuche. Wenig Verkehr, viele Möglichkeiten zum Anhalten und Üben.',
+    schwerpunkte: ['Anfahren und Anhalten', 'Einparken längs zwischen Autos', 'Rechts vor links in Tempo-30-Zone', 'Anfahren am Berg (Lauterachstraße)'],
+    fahrlehrerTipp: 'Wir starten mit allen unseren Fahrschülern hier. Die parallelen Wohnstraßen sind perfekt zum Eingewöhnen — und an der Schule sind die Eltern beruhigt, weil keine Bundesstraße in der Nähe ist.',
+    start: 'Lautlinger Marktplatz',
+    typischeZeit: 'Vormittag, wochentags'
+  },
+  {
+    id: 'ebingen-rundtour',
+    name: 'Ebingen Rundtour',
+    tier: 'beginner',
+    tierLabel: 'Anfänger',
+    km: 6.8,
+    dauer: 22,
+    kurzInfo: '4 Ampeln',
+    tags: ['Ortsverkehr', 'Ampeln', 'Fußgänger'],
+    kuratiert: true,
+    beschreibung: 'Ortsverkehr in Ebingen mit mehreren Ampeln und einem Zebrastreifen am Marktplatz. Erste Begegnung mit dichterem Verkehr.',
+    schwerpunkte: ['Verhalten an Ampeln (Gelb → Vorbereitung)', 'Vorrang für Fußgänger am Zebrastreifen', 'Linksabbiegen mit Gegenverkehr', 'Geschwindigkeit anpassen'],
+    fahrlehrerTipp: 'Wenn die ersten 50 km im Wohngebiet sitzen, ist Ebingen der nächste logische Schritt. Wichtig: morgens vor 9 Uhr vermeiden wegen des Berufsverkehrs an der Sigmaringer Straße.',
+    start: 'Ebingen Stadtbahnhof',
+    typischeZeit: 'Samstag früh oder Nachmittag'
+  },
+  {
+    id: 'truchtelfingen-schleife',
+    name: 'Schleife Truchtelfingen',
+    tier: 'intermediate',
+    tierLabel: 'Mittel',
+    km: 8.7,
+    dauer: 25,
+    kurzInfo: '3 Kreisverkehre',
+    tags: ['Kreisverkehr', 'Landstraße', 'Steigung'],
+    kuratiert: false,
+    beschreibung: 'Über die L442 nach Truchtelfingen, mit drei Kreisverkehren und einer steilen Steigung an der Schalksburg.',
+    schwerpunkte: ['Kreisverkehr (Blinken nur beim Verlassen)', 'Landstraße bei Tempo 100', 'Anfahren am Berg an der Schalksburgsteige', 'Bremsweg auf abschüssiger Strecke'],
+    fahrlehrerTipp: 'Die drei Kreisverkehre kommen hintereinander — perfekt, um den Klick zu setzen, wann geblinkt werden muss. Die Steigung an der Schalksburg ist zudem die Standardstrecke für den Berganfahrtest.',
+    start: 'Lautlingen Marktplatz',
+    typischeZeit: 'Vormittag'
+  },
+  {
+    id: 'onstmettingen',
+    name: 'Onstmettingen über die Alb',
+    tier: 'intermediate',
+    tierLabel: 'Mittel',
+    km: 12.4,
+    dauer: 30,
+    kurzInfo: 'Bergstrecke',
+    tags: ['Serpentinen', 'Steigung', 'Gegenverkehr'],
+    kuratiert: true,
+    beschreibung: 'Die Onstmettinger Steige mit ihren Serpentinen ist ein Klassiker für die Albstadt-Region — hier lernt man, in Kurven richtig zu fahren.',
+    schwerpunkte: ['Geschwindigkeit in Kurven anpassen', 'Schneller Blickwechsel bei Serpentinen', 'Schalten am Berg (3. Gang → 2. Gang)', 'Vorausschauendes Fahren bei Gegenverkehr'],
+    fahrlehrerTipp: 'Klassische Übungsstrecke seit 30 Jahren. Wir machen sie immer mit unseren Fahrschülern, weil die Serpentinen unbarmherzig sind: Wer zu schnell reinfährt, merkt es sofort. Aber unfallarm, weil meistens wenig los ist.',
+    start: 'Lautlingen',
+    typischeZeit: 'Sonntagvormittag (wenig Verkehr)'
+  },
+  {
+    id: 'sigmaringen',
+    name: 'B27 nach Sigmaringen',
+    tier: 'intermediate',
+    tierLabel: 'Mittel',
+    km: 28,
+    dauer: 35,
+    kurzInfo: 'Bundesstraße',
+    tags: ['Bundesstraße', 'Überholen', 'Tempo 100'],
+    kuratiert: false,
+    beschreibung: 'Bundesstraße in Richtung Sigmaringen — gerade, gut ausgebaut, aber mit Überholmanövern.',
+    schwerpunkte: ['Tempo 100 souverän halten', 'Überholmanöver bei Lkw', 'Sicherheitsabstand (halber Tacho)', 'Wechsel zwischen Landstraße und Ortsverkehr'],
+    fahrlehrerTipp: 'Gute Vorbereitung auf Autobahn-ähnliche Bedingungen, aber ohne den Stress einer echten Autobahn. Wer hier souverän überholt, schafft auch die B27 nach Tübingen.',
+    start: 'Albstadt-Onstmettingen',
+    typischeZeit: 'Sonntag oder feiertags'
+  },
+  {
+    id: 'b27-tuebingen',
+    name: 'B27 nach Tübingen',
+    tier: 'advanced',
+    tierLabel: 'Fortgeschritten',
+    km: 32,
+    dauer: 40,
+    kurzInfo: '4-spurig phasenweise',
+    tags: ['Autobahn-ähnlich', 'Spurwechsel', 'Tempo 100'],
+    kuratiert: true,
+    beschreibung: 'Die B27 ist phasenweise vierstreifig und damit fast wie eine Autobahn — die perfekte Vorbereitung für die ersten echten Autobahnfahrten.',
+    schwerpunkte: ['Auffahren auf eine schnelle Straße', 'Linksspur-Nutzung beim Überholen', 'Spurwechsel bei Tempo 100', 'Einfädeln in zähen Verkehr'],
+    fahrlehrerTipp: 'Wir nehmen die B27 immer als letzte Stufe vor der echten Autobahn. Die Verkehrsdichte ist ähnlich, aber die Geschwindigkeit niedriger — was es psychologisch leichter macht. Außerdem: Bei Tübingen Umweltzone — grüne Plakette beachten.',
+    start: 'Albstadt-Lautlingen',
+    typischeZeit: 'Samstagvormittag'
+  },
+  {
+    id: 'a8-wendlingen',
+    name: 'A8 Wendlingen Kurz-Schleife',
+    tier: 'advanced',
+    tierLabel: 'Fortgeschritten',
+    km: 18,
+    dauer: 25,
+    kurzInfo: 'Erste Autobahn',
+    tags: ['Autobahn', 'Auffahrt', 'Spurwechsel'],
+    kuratiert: true,
+    beschreibung: 'Auffahrt Wendlingen → kurze Autobahnfahrt → Abfahrt Wendlingen-Nord. Perfekte erste Autobahn-Erfahrung mit garantierter Heimkehr nach 8 Minuten.',
+    schwerpunkte: ['Beschleunigen auf Tempo 120', 'Spurwechsel mit Schulterblick', 'Rechtsfahrgebot', 'Abfahrt rechtzeitig vorbereiten'],
+    fahrlehrerTipp: 'Eine der wertvollsten Strecken überhaupt. 8 Minuten Autobahn klingt nach wenig, aber für Anfänger ist das perfekt — Auffahrt, Spur halten, Spurwechsel, Abfahrt. Alle wichtigen Skills in einer kurzen Runde.',
+    start: 'Albstadt-Lautlingen',
+    typischeZeit: 'Sonntagvormittag (geringes Verkehrsaufkommen)'
+  },
+  {
+    id: 'nachtfahrt-eb',
+    name: 'Nachtfahrt Ebingen',
+    tier: 'advanced',
+    tierLabel: 'Fortgeschritten',
+    km: 9.5,
+    dauer: 25,
+    kurzInfo: 'Bei Dunkelheit',
+    tags: ['Nachtfahrt', 'Fernlicht', 'Sicht'],
+    kuratiert: true,
+    beschreibung: 'Bekannte Tagesstrecke, aber bei Dunkelheit. Komplett anderes Fahrerlebnis — Sicht reduziert, Entfernungen schwerer einzuschätzen.',
+    schwerpunkte: ['Fernlicht richtig nutzen (abblenden!)', 'Geschwindigkeit der Sichtweite anpassen', 'Wildwechsel-Aufmerksamkeit', 'Lampen-Check vor Fahrtbeginn'],
+    fahrlehrerTipp: 'Im Winter wird das problemlos um 17 Uhr möglich. Wir empfehlen, die Strecke zuerst im Hellen zu fahren und dann erst im Dunkeln — der Vergleichseffekt ist sehr lehrreich.',
+    start: 'Ebingen Stadtbahnhof',
+    typischeZeit: 'November-Februar nach 17 Uhr'
+  },
+  {
+    id: 'balingen',
+    name: 'Balingen Stadtrunde',
+    tier: 'intermediate',
+    tierLabel: 'Mittel',
+    km: 14.6,
+    dauer: 30,
+    kurzInfo: 'Dichter Verkehr',
+    tags: ['Stadtverkehr', 'Komplex', 'Mehrspurig'],
+    kuratiert: false,
+    beschreibung: 'Innenstadt von Balingen mit höherer Verkehrsdichte als Albstadt. Mehrspurige Abschnitte und komplexe Kreuzungen.',
+    schwerpunkte: ['Spurwahl an Kreuzungen', 'Verkehrsdichte aushalten', 'Vorausschauend fahren', 'Reaktion auf Fußgänger und Radfahrer'],
+    fahrlehrerTipp: 'Vor der praktischen Prüfung lohnt sich Balingen sehr — das Verkehrsaufkommen ist näher dran an dem, was später in jeder Stadt erwartet wird. Auch das Parken am Krankenhaus ist eine gute Übung.',
+    start: 'Albstadt-Lautlingen',
+    typischeZeit: 'Werktag-Nachmittag'
+  },
+  {
+    id: 'engstingen',
+    name: 'Über Engstingen nach Reutlingen',
+    tier: 'advanced',
+    tierLabel: 'Fortgeschritten',
+    km: 38,
+    dauer: 55,
+    kurzInfo: 'Lange Strecke',
+    tags: ['Konzentration', 'Wechsel', 'Bundesstraße'],
+    kuratiert: false,
+    beschreibung: 'Längere Strecke über die Schwäbische Alb — gut für Ausdauer und Wechsel zwischen Landstraße, Ort und kurvigen Abschnitten.',
+    schwerpunkte: ['Konzentration über längere Strecke halten', 'Müdigkeit erkennen', 'Pausen einplanen', 'Anpassung an wechselnde Straßen'],
+    fahrlehrerTipp: 'Ideale "Bewährungsstrecke" gegen Ende der Ausbildung. Wer hier 55 Minuten am Stück fokussiert fährt, ist prüfungsreif. Reutlingen hat Umweltzone — grüne Plakette nicht vergessen.',
+    start: 'Albstadt-Lautlingen',
+    typischeZeit: 'Wochenende vormittag'
+  },
+  {
+    id: 'bisingen-test',
+    name: 'Bisingen Mini-Runde',
+    tier: 'beginner',
+    tierLabel: 'Anfänger',
+    km: 5.4,
+    dauer: 18,
+    kurzInfo: 'Erste Kreuzungen',
+    tags: ['Wenig Verkehr', 'Kreuzungen', 'Ortsdurchfahrt'],
+    kuratiert: false,
+    beschreibung: 'Kurze Schleife durch Bisingen — übersichtlich, mit ersten ungeregelten Kreuzungen (rechts vor links).',
+    schwerpunkte: ['Rechts vor links sicher anwenden', 'Beschleunigen aus dem Stand', 'Verkehrszeichen lesen', 'Innerortsgeschwindigkeit halten'],
+    fahrlehrerTipp: 'Gut als zweite Übungsstrecke nach den ersten Stunden im Wohngebiet. Die Kreuzungen sind übersichtlich genug, dass Fehler keine Folgen haben.',
+    start: 'Albstadt-Ebingen',
+    typischeZeit: 'Werktag früh oder mittags'
+  }
+];
+
+// =========================================================================
+// VERGANGENE FAHRTEN — Beispiele für Trip History
+// =========================================================================
+const FAHRTEN_HISTORIE = [
+  { datum: '13.5.2026', km: 11.4, thema: 'Autobahnauffahrt', begleiter: 'Papa', selbstbewertung: 4 },
+  { datum: '11.5.2026', km: 8.7, thema: 'Schleife Truchtelfingen', begleiter: 'Papa', selbstbewertung: 5 },
+  { datum: '10.5.2026', km: 12.4, thema: 'Onstmettinger Steige', begleiter: 'Oma Inge', selbstbewertung: 3 },
+  { datum: '08.5.2026', km: 6.8, thema: 'Ebingen Stadtverkehr', begleiter: 'Papa', selbstbewertung: 4 },
+  { datum: '07.5.2026', km: 4.2, thema: 'Wohngebiet Parkübungen', begleiter: 'Oma Inge', selbstbewertung: 5 },
+  { datum: '05.5.2026', km: 9.5, thema: 'Bisingen Mini-Runde', begleiter: 'Papa', selbstbewertung: 4 }
+];
+
+// =========================================================================
+// PFLICHT-ROADMAP nach Referentenentwurf vom 4. Mai 2026
+// =========================================================================
+const PFLICHT_ROADMAP = [
+  { 
+    name: 'Theorieprüfung bestanden',
+    meta: 'Voraussetzung',
+    detail: 'Bestanden am 22.04.2026 mit 6 Fehlerpunkten',
+    status: 'done'
+  },
+  {
+    name: '6 Pflicht-Fahrstunden vor Laienausbildung',
+    meta: '6 / 6 absolviert',
+    detail: 'Grundausbildung in der Fahrschule abgeschlossen',
+    status: 'done'
+  },
+  {
+    name: 'Theoretische Einweisung mit Begleitperson',
+    meta: 'Termin: 03.05.2026',
+    detail: 'Papa und Oma Inge wurden gemeinsam mit Mia eingewiesen',
+    status: 'done'
+  },
+  {
+    name: '1.000 km Laienausbildung',
+    meta: '342 / 1.000 km',
+    detail: 'Aktueller Stand: 34% der Strecke. Fahrtenprotokoll wird automatisch geführt.',
+    status: 'active'
+  },
+  {
+    name: 'Beobachtungsfahrt mit Begleitperson und Fahrlehrer',
+    meta: 'Nach Erreichen der 1.000 km',
+    detail: 'Geplant für Juli 2026 — wir besprechen den Lernfortschritt gemeinsam',
+    status: 'todo'
+  },
+  {
+    name: 'Mindestens 6 Pflicht-Fahrstunden nach Laienausbildung',
+    meta: '0 / 6',
+    detail: 'Inklusive der besonderen Ausbildungsfahrten (Überland, Autobahn, Dunkelfahrt)',
+    status: 'todo'
+  },
+  {
+    name: 'Prüfungsvorbereitungsfahrt',
+    meta: 'Feststellung der Prüfungsreife',
+    detail: 'Hier entscheidet der Fahrlehrer, ob Mia bereit für die Prüfung ist',
+    status: 'todo'
+  },
+  {
+    name: 'Praktische Fahrprüfung',
+    meta: '25 Minuten Fahrzeit',
+    detail: 'Nach neuer Regelung (Referentenentwurf 4.5.2026)',
+    status: 'todo'
+  }
+];
+
+// =========================================================================
+// SKILL-LEVELS für die Fahrschul-Übersicht
+// =========================================================================
+const SKILLS = [
+  { name: 'Kreisverkehr', wert: 85, status: 'good', statusLabel: 'souverän' },
+  { name: 'Einparken längs', wert: 72, status: 'good', statusLabel: 'sicher' },
+  { name: 'Anfahren am Berg', wert: 80, status: 'good', statusLabel: 'sicher' },
+  { name: 'Spurwechsel Autobahn', wert: 35, status: 'bad', statusLabel: 'unsicher' },
+  { name: 'Nachtfahrt', wert: 25, status: 'bad', statusLabel: 'noch offen' }
+];
+
+// =========================================================================
+// VIEW RENDERING — alle Views werden hier generiert
+// =========================================================================
+
+function renderViews() {
+  const screen = document.getElementById('screen');
+  screen.innerHTML = `
+    ${renderHome()}
+    ${renderDrive()}
+    ${renderTracking()}
+    ${renderDebrief()}
+    ${renderHistory()}
+    ${renderLearn()}
+    ${renderQuiz()}
+    ${renderRoutes()}
+    ${renderRouteDetail()}
+    ${renderFS()}
+  `;
+}
+
+function renderHome() {
+  const prozent = Math.round((STATE.fortschritt.kmGefahren / STATE.fortschritt.kmZiel) * 100);
+  return `
+  <div class="view active" data-view="home">
+    <div class="home-header">
+      <div class="home-greeting">Hallo ${STATE.user.name},</div>
+      <div class="home-name">guten Morgen.</div>
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-label">Deine Ausbildung</div>
+      <div class="progress-km">
+        ${STATE.fortschritt.kmGefahren}<span class="of">/ ${STATE.fortschritt.kmZiel} km in Begleitung</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar-fill" style="width: ${prozent}%"></div>
+      </div>
+      <div class="progress-meta">
+        <span><strong>${prozent}%</strong> geschafft</span>
+        <span>Begleiter: ${STATE.user.begleiter.join(' & ')}</span>
+      </div>
+    </div>
+
+    <div class="section-title">Heute<small>Di · 14. Mai</small></div>
+
+    <div class="next-trip" onclick="goto('drive', { thema: 'autobahnauffahrt' })">
+      <div class="next-trip-label">Geplante Fahrt · 16:30</div>
+      <div class="next-trip-text">Erste <strong>Autobahn-Auffahrt</strong> — die kurze Schleife A8 Wendlingen. Mit Papa.</div>
+    </div>
+
+    <div class="section-title">Module</div>
+
+    <div class="module-grid">
+      <div class="module-card featured" onclick="goto('drive')">
+        <div class="module-icon">→</div>
+        <div>
+          <div class="module-label">Beifahrer</div>
+          <div class="module-sub">Coaching · Tracking · Debrief</div>
+        </div>
+      </div>
+
+      <div class="module-card" onclick="goto('learn')">
+        <span class="module-badge">NEU</span>
+        <div class="module-icon">i</div>
+        <div>
+          <div class="module-label">Refresher</div>
+          <div class="module-sub">Auffrischung für Begleitende</div>
+        </div>
+      </div>
+
+      <div class="module-card wide" onclick="goto('routes')">
+        <div class="module-icon">∞</div>
+        <div class="module-text">
+          <div class="module-label">Mein Übungsweg</div>
+          <div class="module-sub">${STRECKEN.length} kuratierte Strecken in Albstadt und Umgebung – vom Wohngebiet bis zur A8.</div>
+        </div>
+      </div>
+
+      <div class="module-card wide" onclick="goto('history')">
+        <div class="module-icon">↻</div>
+        <div class="module-text">
+          <div class="module-label">Meine Fahrten</div>
+          <div class="module-sub">${STATE.fortschritt.fahrten} Fahrten · letzter Eintrag heute · komplett dokumentiert</div>
+        </div>
+      </div>
+
+      <div class="module-card wide" onclick="goto('fs')">
+        <div class="module-icon">⚲</div>
+        <div class="module-text">
+          <div class="module-label">Meine Fahrschule</div>
+          <div class="module-sub">${STATE.user.fahrschule} · ${STATE.user.ort} · Nächste Prüfungsvorbereitung: noch nicht angesetzt</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDrive() {
+  // Default theme: autobahnauffahrt
+  const aktiv = window.aktivesCoaching || 'autobahnauffahrt';
+  const themen = Object.entries(COACHING_THEMEN).map(([key, t]) => 
+    `<div class="topic-pill ${key === aktiv ? 'active' : ''}" data-key="${key}" onclick="selectCoaching('${key}')">${t.name}</div>`
+  ).join('');
+  const aktivData = COACHING_THEMEN[aktiv];
+  
+  return `
+  <div class="view" data-view="drive">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('home')">‹</div>
+      <div>
+        <div class="sub-title">Beifahrer</div>
+        <div class="sub-title-meta">Vor der Fahrt</div>
+      </div>
+    </div>
+
+    <div class="coaching-card">
+      <div class="coaching-eyebrow">Vor der Fahrt · 60 Sekunden</div>
+      <div class="coaching-title">Was wollt ihr heute üben?</div>
+      <div class="topic-pills" id="topic-pills">${themen}</div>
+    </div>
+
+    <div class="coaching-tip" id="coaching-tip">
+      <div class="tip-label">Tipp für ${STATE.user.begleiter[0]}</div>
+      <div class="tip-text">${aktivData.tipp}</div>
+      <div class="tip-steps">
+        <div class="tip-steps-label">»» So gelingt's</div>
+        ${aktivData.schritte.map((s, i) => `<div class="tip-step"><span class="num">${(i+1).toString().padStart(2, '0')}</span><span>${s}</span></div>`).join('')}
+      </div>
+      <div class="tip-after">
+        <strong>Nach der Fahrt fragen:</strong> ${aktivData.nachher}
+      </div>
+    </div>
+
+    <button class="start-cta" onclick="startTracking()">
+      <span class="dot"></span>
+      Fahrt starten
+    </button>
+  </div>`;
+}
+
+function renderTracking() {
+  return `
+  <div class="view" data-view="tracking">
+    <div class="tracking-active">
+      <div class="tracking-topic" id="tracking-topic">Autobahnauffahrt · läuft</div>
+      <div class="tracking-elapsed" id="tracking-elapsed">00:00:00</div>
+      
+      <div class="tracking-stats">
+        <div>
+          <div class="tstat-label">km heute</div>
+          <div class="tstat-value" id="tracking-km">0,0</div>
+        </div>
+        <div>
+          <div class="tstat-label">⌀ Tempo</div>
+          <div class="tstat-value" id="tracking-tempo">0</div>
+        </div>
+        <div>
+          <div class="tstat-label">Begleiter</div>
+          <div class="tstat-value" style="font-size: 18px; margin-top: 10px;">${STATE.user.begleiter[0]}</div>
+        </div>
+      </div>
+
+      <div class="live-map">
+        <svg viewBox="0 0 350 200" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,238,0,0.05)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)"/>
+          <path d="M 30 170 Q 80 160, 120 140 T 200 100 Q 250 80, 290 50 L 320 30" 
+                fill="none" stroke="rgba(255,238,0,0.2)" stroke-width="7" stroke-linecap="round"/>
+          <path d="M 30 170 Q 80 160, 120 140 T 200 100 Q 250 80, 290 50 L 320 30" 
+                fill="none" stroke="#FFEE00" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="30" cy="170" r="6" fill="#6bcf7f"/>
+          <circle cx="290" cy="50" r="6" fill="#FFEE00">
+            <animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+
+      <button class="stop-btn" onclick="stopTracking()">Fahrt beenden</button>
+    </div>
+  </div>`;
+}
+
+function renderDebrief() {
+  return `
+  <div class="view" data-view="debrief">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('home')">‹</div>
+      <div>
+        <div class="sub-title">Wie war's?</div>
+        <div class="sub-title-meta">Debrief · 3 Fragen</div>
+      </div>
+    </div>
+
+    <div class="debrief-question">
+      <span class="debrief-who bewerber">${STATE.user.name}</span>
+      <div class="debrief-q">Wie sicher hast du dich gefühlt?</div>
+      <div class="rating">
+        ${[1,2,3,4,5].map(n => `<div class="rating-dot ${n===4?'selected':''}" onclick="selectRating(this)">${n}</div>`).join('')}
+      </div>
+      <div class="rating-labels">
+        <span>unsicher</span>
+        <span>souverän</span>
+      </div>
+    </div>
+
+    <div class="debrief-question">
+      <span class="debrief-who begleiter">${STATE.user.begleiter[0]}</span>
+      <div class="debrief-q">Was hat heute gut geklappt?</div>
+      <textarea class="debrief-textarea" rows="2" placeholder="In eigenen Worten…">Mia hat die Auffahrt souverän gemacht, war aber unsicher beim Spurwechsel zurück auf die rechte Spur.</textarea>
+    </div>
+
+    <div class="debrief-question">
+      <span class="debrief-who begleiter">${STATE.user.begleiter[0]}</span>
+      <div class="debrief-q">Worauf sollte sie beim nächsten Mal achten?</div>
+      <textarea class="debrief-textarea" rows="2" placeholder="In eigenen Worten…">Schulterblick vor dem Spurwechsel – sie verlässt sich noch zu sehr auf die Spiegel.</textarea>
+    </div>
+
+    <button class="start-cta" onclick="saveAndGoHome()" style="background: var(--green-ok); margin-bottom: 20px;">
+      Speichern · weiter zur Fahrschule
+    </button>
+  </div>`;
+}
+
+function renderHistory() {
+  const items = FAHRTEN_HISTORIE.map(f => `
+    <div class="history-trip">
+      <div class="history-trip-head">
+        <span class="history-date">${f.datum}</span>
+        <span class="history-km">${f.km} km</span>
+      </div>
+      <div class="history-topic">${f.thema}</div>
+      <div class="history-meta">Mit ${f.begleiter} · Selbstbewertung: ${'★'.repeat(f.selbstbewertung)}${'☆'.repeat(5-f.selbstbewertung)}</div>
+    </div>
+  `).join('');
+  
+  return `
+  <div class="view" data-view="history">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('home')">‹</div>
+      <div>
+        <div class="sub-title">Meine Fahrten</div>
+        <div class="sub-title-meta">${FAHRTEN_HISTORIE.length} dokumentierte Fahrten</div>
+      </div>
+    </div>
+    <div class="history-list">${items}</div>
+  </div>`;
+}
+
+function renderLearn() {
+  const items = REFRESHER_THEMEN.map((t, i) => {
+    const statusBadge = t.status === 'done' ? '<div class="topic-status done">✓</div>' :
+                       t.status === 'new' ? '<div class="topic-status new">!</div>' :
+                       `<div class="topic-status todo">${t.fragen.length}</div>`;
+    return `
+      <div class="theorie-topic" onclick="startQuiz('${t.id}')">
+        <div class="topic-num">${(i+1).toString().padStart(2, '0')}</div>
+        <div class="topic-body">
+          <div class="topic-title">${t.name}</div>
+          <div class="topic-meta">${t.meta}</div>
+        </div>
+        ${statusBadge}
+      </div>
+    `;
+  }).join('');
+
+  return `
+  <div class="view" data-view="learn">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('home')">‹</div>
+      <div>
+        <div class="sub-title">Refresher</div>
+        <div class="sub-title-meta">Für die Begleitperson</div>
+      </div>
+    </div>
+
+    <div class="theorie-intro">
+      <strong>Hallo ${STATE.user.begleiter[0]}.</strong> Hier ein paar Themen, die sich seit deinem Führerschein (1998) geändert haben – damit du ${STATE.user.name} richtig begleiten kannst.
+    </div>
+
+    ${items}
+  </div>`;
+}
+
+function renderQuiz() {
+  return `<div class="view" data-view="quiz" id="quiz-view"></div>`;
+}
+
+function renderQuizContent(themaId) {
+  const thema = REFRESHER_THEMEN.find(t => t.id === themaId);
+  if (!thema) return;
+  
+  const frageIdx = STATE.quiz.aktuelleFrage;
+  const frage = thema.fragen[frageIdx];
+  if (!frage) {
+    // Quiz abgeschlossen
+    document.getElementById('quiz-view').innerHTML = `
+      <div class="sub-header">
+        <div class="back-btn" onclick="goto('learn')">‹</div>
+        <div>
+          <div class="sub-title">${thema.name}</div>
+          <div class="sub-title-meta">Abgeschlossen</div>
+        </div>
+      </div>
+      <div class="quiz-card" style="text-align: center; padding: 40px 24px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
+        <div style="font-size: 22px; font-weight: 700; margin-bottom: 10px;">Geschafft!</div>
+        <div style="font-size: 14px; color: var(--text-soft); line-height: 1.5;">Du hast ${STATE.quiz.antworten.filter(a => a).length} von ${thema.fragen.length} Fragen richtig beantwortet.</div>
+        <button class="next-quiz-btn" onclick="goto('learn')" style="margin-top: 24px;">Zurück zur Übersicht</button>
+      </div>
+    `;
+    return;
+  }
+
+  const progressBars = thema.fragen.map((_, i) => {
+    if (i < frageIdx) return '<span class="done"></span>';
+    if (i === frageIdx) return '<span class="active"></span>';
+    return '<span></span>';
+  }).join('');
+
+  const antworten = frage.antworten.map((a, i) => `
+    <button class="quiz-answer" onclick="answerQuiz(${i}, ${a.korrekt})">
+      <span class="quiz-letter">${String.fromCharCode(65 + i)}</span>
+      <span>${a.text}</span>
+    </button>
+  `).join('');
+
+  document.getElementById('quiz-view').innerHTML = `
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('learn')">‹</div>
+      <div>
+        <div class="sub-title">${thema.name}</div>
+        <div class="sub-title-meta">Frage ${frageIdx + 1} von ${thema.fragen.length}</div>
+      </div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-progress">${progressBars}</div>
+      <div class="quiz-eyebrow">
+        <span>Frage ${frageIdx + 1} von ${thema.fragen.length}</span>
+        ${frage.sicherheitsrelevant ? '<span class="alert-tag">Sicherheitsrelevant</span>' : ''}
+      </div>
+      <div class="quiz-question">${frage.text}</div>
+      
+      <div class="quiz-context">${frage.kontext}</div>
+
+      <div class="quiz-answers">${antworten}</div>
+    </div>
+
+    <div class="quiz-feedback" id="quizFeedback">
+      <div class="feedback-label" id="feedbackLabel">Richtig</div>
+      <div class="feedback-text" id="feedbackText"></div>
+      ${frage.paragraph ? `<div class="feedback-paragraph">» Rechtsgrundlage: ${frage.paragraph}</div>` : ''}
+      <button class="next-quiz-btn" onclick="nextQuestion('${themaId}')">${frageIdx + 1 < thema.fragen.length ? 'Nächste Frage →' : 'Quiz abschließen →'}</button>
+    </div>
+  `;
+}
+
+function renderRoutes() {
+  return `<div class="view" data-view="routes" id="routes-view"></div>`;
+}
+
+function renderRoutesContent(filter = 'all') {
+  let filtered = STRECKEN;
+  if (filter === 'beginner') filtered = STRECKEN.filter(s => s.tier === 'beginner');
+  else if (filter === 'autobahn') filtered = STRECKEN.filter(s => s.tags.some(t => t.toLowerCase().includes('autobahn')));
+  else if (filter === 'kreisverkehr') filtered = STRECKEN.filter(s => s.tags.some(t => t.toLowerCase().includes('kreisverkehr')));
+  else if (filter === 'nacht') filtered = STRECKEN.filter(s => s.tags.some(t => t.toLowerCase().includes('nacht')));
+
+  const filterChip = (key, label, count) => 
+    `<div class="filter-chip ${filter === key ? 'active' : ''}" onclick="filterRoutes('${key}')">${label}${count !== undefined ? ' (' + count + ')' : ''}</div>`;
+
+  const cards = filtered.map(r => `
+    <div class="route-card" onclick="showRoute('${r.id}')">
+      <div class="route-tier ${r.tier}">${r.tierLabel}</div>
+      <div class="route-name">${r.name}</div>
+      <div class="route-meta">
+        <span>⌀ <strong>${r.km} km</strong></span>
+        <span>⏱ <strong>${r.dauer} min</strong></span>
+        <span>${r.kurzInfo}</span>
+      </div>
+      <div class="route-tags">
+        ${r.tags.map(t => `<span class="route-tag">${t}</span>`).join('')}
+      </div>
+      ${r.kuratiert ? '<div class="fs-curated">Empfohlen von move by berthele</div>' : ''}
+    </div>
+  `).join('');
+
+  document.getElementById('routes-view').innerHTML = `
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('home')">‹</div>
+      <div>
+        <div class="sub-title">Mein Übungsweg</div>
+        <div class="sub-title-meta">${STRECKEN.length} Strecken · Region Albstadt</div>
+      </div>
+    </div>
+
+    <div class="map-container">
+      <svg viewBox="0 0 350 280" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="terrain-dark" width="30" height="30" patternUnits="userSpaceOnUse">
+            <circle cx="15" cy="15" r="0.6" fill="rgba(255,238,0,0.06)"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="#1f1f1f"/>
+        <rect width="100%" height="100%" fill="url(#terrain-dark)"/>
+        
+        <path d="M 0 100 Q 80 90, 160 110 T 350 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+        <path d="M 0 140 Q 100 130, 180 145 T 350 135" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+        <path d="M 0 180 Q 90 170, 200 185 T 350 175" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>
+        
+        <circle cx="175" cy="140" r="22" fill="rgba(255,238,0,0.08)"/>
+        
+        <path d="M 175 140 Q 150 125, 130 110 Q 110 100, 90 110" fill="none" stroke="#6bcf7f" stroke-width="3" stroke-linecap="round"/>
+        <path d="M 175 140 Q 200 130, 230 125 Q 260 120, 280 100" fill="none" stroke="#a8a8a3" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 4"/>
+        <path d="M 175 140 Q 200 165, 220 190 Q 240 220, 280 235" fill="none" stroke="#FFEE00" stroke-width="3" stroke-linecap="round"/>
+        
+        <circle cx="175" cy="140" r="8" fill="#FFEE00"/>
+        <circle cx="175" cy="140" r="3" fill="#1a1a1a"/>
+        
+        <circle cx="90" cy="110" r="5" fill="#6bcf7f"/>
+        <circle cx="280" cy="100" r="5" fill="#a8a8a3"/>
+        <circle cx="280" cy="235" r="5" fill="#FFEE00"/>
+        
+        <text x="185" y="158" font-family="Inter Tight, sans-serif" font-size="11" font-weight="700" fill="#FFEE00" letter-spacing="0.5">Albstadt</text>
+        <text x="55" y="100" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#6bcf7f">Lautlingen</text>
+        <text x="232" y="90" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#a8a8a3">Truchtelfingen</text>
+        <text x="232" y="252" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#FFEE00">B27 Süd</text>
+      </svg>
+    </div>
+
+    <div class="filter-row">
+      ${filterChip('all', 'Alle', STRECKEN.length)}
+      ${filterChip('beginner', 'Anfänger', STRECKEN.filter(s => s.tier === 'beginner').length)}
+      ${filterChip('autobahn', 'Autobahn', STRECKEN.filter(s => s.tags.some(t => t.toLowerCase().includes('autobahn'))).length)}
+      ${filterChip('kreisverkehr', 'Kreisverkehr', STRECKEN.filter(s => s.tags.some(t => t.toLowerCase().includes('kreisverkehr'))).length)}
+      ${filterChip('nacht', 'Nachtfahrt', STRECKEN.filter(s => s.tags.some(t => t.toLowerCase().includes('nacht'))).length)}
+    </div>
+
+    ${cards}
+  `;
+}
+
+function renderRouteDetail() {
+  return `<div class="view" data-view="route-detail" id="route-detail-view"></div>`;
+}
+
+function renderRouteDetailContent(routeId) {
+  const r = STRECKEN.find(s => s.id === routeId);
+  if (!r) return;
+  
+  document.getElementById('route-detail-view').innerHTML = `
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('routes')">‹</div>
+      <div>
+        <div class="sub-title">Strecke</div>
+        <div class="sub-title-meta">${r.tierLabel}</div>
+      </div>
+    </div>
+
+    <div class="route-detail-hero">
+      <span class="tier" style="background: ${r.tier === 'beginner' ? 'rgba(107,207,127,0.15)' : r.tier === 'intermediate' ? 'var(--bg-elev)' : 'var(--yellow-glow)'}; color: ${r.tier === 'beginner' ? 'var(--green-ok)' : r.tier === 'intermediate' ? 'var(--text-soft)' : 'var(--yellow)'};">${r.tierLabel}</span>
+      <h2>${r.name}</h2>
+      <div class="route-detail-stats">
+        <div>
+          <div class="rd-stat-label">Strecke</div>
+          <div class="rd-stat-value">${r.km}<span style="font-size: 14px; color: var(--text-muted); font-weight: 500;"> km</span></div>
+        </div>
+        <div>
+          <div class="rd-stat-label">Dauer</div>
+          <div class="rd-stat-value">${r.dauer}<span style="font-size: 14px; color: var(--text-muted); font-weight: 500;"> min</span></div>
+        </div>
+        <div>
+          <div class="rd-stat-label">Start</div>
+          <div class="rd-stat-value" style="font-size: 13px; font-weight: 600; margin-top: 8px;">${r.start}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-section">
+      <div class="route-section-label">»» Beschreibung</div>
+      <div class="route-section-text">${r.beschreibung}</div>
+    </div>
+
+    <div class="route-section">
+      <div class="route-section-label">»» Übungsschwerpunkte</div>
+      <ul>${r.schwerpunkte.map(s => `<li>${s}</li>`).join('')}</ul>
+    </div>
+
+    ${r.kuratiert ? `
+    <div class="route-section" style="border-color: var(--yellow);">
+      <div class="route-section-label">»» Fahrlehrer-Tipp</div>
+      <div class="route-section-text" style="font-style: italic;">"${r.fahrlehrerTipp}"</div>
+      <div style="font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 12px; letter-spacing: 0.05em;">— ${STATE.user.fahrschule}</div>
+    </div>
+    ` : ''}
+
+    <div class="route-section">
+      <div class="route-section-label">»» Empfohlene Zeit</div>
+      <div class="route-section-text">${r.typischeZeit}</div>
+    </div>
+
+    <button class="start-cta" onclick="goto('drive')" style="margin-top: 20px; margin-bottom: 24px;">
+      Für diese Strecke einplanen
+    </button>
+  `;
+}
+
+function renderFS() {
+  const skillRows = SKILLS.map(s => `
+    <div class="fs-skill-row">
+      <div class="fs-skill-head">
+        <span class="name">${s.name}</span>
+        <span class="status ${s.status}">${s.statusLabel}</span>
+      </div>
+      <div class="fs-skill-bar"><div class="fs-skill-bar-fill" style="width: ${s.wert}%; background: ${s.status === 'good' ? 'var(--green-ok)' : s.status === 'ok' ? 'var(--yellow)' : 'var(--red-alert)'};"></div></div>
+    </div>
+  `).join('');
+
+  const roadmap = PFLICHT_ROADMAP.map(p => {
+    const icon = p.status === 'done' ? '✓' : p.status === 'active' ? '→' : ' ';
+    return `
+      <div class="roadmap-item">
+        <div class="roadmap-status ${p.status}">${icon}</div>
+        <div class="roadmap-body">
+          <div class="roadmap-name">${p.name}</div>
+          <div class="roadmap-meta">${p.meta}</div>
+          <div class="roadmap-detail">${p.detail}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+  <div class="view" data-view="fs">
+    <div class="sub-header">
+      <div class="back-btn" onclick="goto('home')">‹</div>
+      <div>
+        <div class="sub-title">Meine Fahrschule</div>
+        <div class="sub-title-meta">${STATE.user.fahrschule}</div>
+      </div>
+    </div>
+
+    <div class="coaching-card">
+      <div class="coaching-eyebrow">${STATE.user.fahrschule} · ${STATE.user.ort}</div>
+      <div class="coaching-title" style="font-size: 24px;">${STATE.user.name} macht gute Fortschritte.</div>
+      
+      <div class="fs-stats">
+        <div class="fs-stat-box">
+          <div class="fs-stat-label">km gesamt</div>
+          <div class="fs-stat-value">${STATE.fortschritt.kmGefahren}</div>
+        </div>
+        <div class="fs-stat-box">
+          <div class="fs-stat-label">Fahrten</div>
+          <div class="fs-stat-value">${STATE.fortschritt.fahrten}</div>
+        </div>
+      </div>
+
+      <div class="fs-skill">
+        <div class="fs-stat-label">Übungsschwerpunkte</div>
+        ${skillRows}
+      </div>
+    </div>
+
+    <div class="roadmap-card">
+      <div class="roadmap-eyebrow">»» Pflicht-Roadmap</div>
+      <div class="roadmap-title">Wo steht ${STATE.user.name} gerade?</div>
+      <div style="font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.05em;">Nach Referentenentwurf vom 4.5.2026</div>
+      <div class="roadmap-list">${roadmap}</div>
+    </div>
+
+    <div class="coaching-tip">
+      <div class="tip-label">»» Vorschlag der Fahrschule</div>
+      <div class="tip-text">Für die nächsten Fahrten empfehlen wir, gezielt Spurwechsel auf der B27 zu üben. ${STATE.user.name} hat das mehrfach als unsicher gekennzeichnet.</div>
+      <div class="tip-after">
+        <strong>Termin buchen?</strong> Im nächsten Schritt geht's direkt zum Kalender deiner Fahrschule.
+      </div>
+    </div>
+  </div>`;
+}
+
+// =========================================================================
+// CONTROLLER / NAVIGATION
+// =========================================================================
+
+let trackingTimer = null;
+let trackingStart = null;
+
+function goto(view, params = {}) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.querySelector(`[data-view="${view}"]`);
+  if (target) target.classList.add('active');
+  
+  const tabMap = {
+    home: 'home',
+    drive: 'drive', tracking: 'drive', debrief: 'drive',
+    learn: 'learn', quiz: 'learn',
+    routes: 'routes', 'route-detail': 'routes',
+    history: null, fs: null
+  };
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const activeTab = tabMap[view];
+  if (activeTab) {
+    document.querySelector(`.tab[data-tab="${activeTab}"]`).classList.add('active');
+  }
+  
+  document.getElementById('screen').scrollTop = 0;
+  
+  if (view === 'drive' && params.thema) {
+    window.aktivesCoaching = params.thema;
+    document.querySelector('[data-view="drive"]').outerHTML = renderDrive();
+    // re-bind
+    setTimeout(() => {
+      const target2 = document.querySelector('[data-view="drive"]');
+      if (target2) target2.classList.add('active');
+    }, 0);
+  }
+  
+  if (view === 'routes') renderRoutesContent();
+  
+  // Stop tracking timer if leaving
+  if (view !== 'tracking' && trackingTimer) {
+    clearInterval(trackingTimer);
+    trackingTimer = null;
+  }
+}
+
+function selectCoaching(key) {
+  window.aktivesCoaching = key;
+  const data = COACHING_THEMEN[key];
+  
+  // Update pills
+  document.querySelectorAll('#topic-pills .topic-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.key === key);
+  });
+  
+  // Update tip
+  const tipEl = document.getElementById('coaching-tip');
+  tipEl.innerHTML = `
+    <div class="tip-label">Tipp für ${STATE.user.begleiter[0]}</div>
+    <div class="tip-text">${data.tipp}</div>
+    <div class="tip-steps">
+      <div class="tip-steps-label">»» So gelingt's</div>
+      ${data.schritte.map((s, i) => `<div class="tip-step"><span class="num">${(i+1).toString().padStart(2, '0')}</span><span>${s}</span></div>`).join('')}
+    </div>
+    <div class="tip-after">
+      <strong>Nach der Fahrt fragen:</strong> ${data.nachher}
+    </div>
+  `;
+}
+
+function startTracking() {
+  goto('tracking');
+  const aktiv = window.aktivesCoaching || 'autobahnauffahrt';
+  const data = COACHING_THEMEN[aktiv];
+  document.getElementById('tracking-topic').textContent = `${data.name} · läuft`;
+  
+  trackingStart = Date.now();
+  let simKm = 0;
+  let simTempo = 0;
+  
+  trackingTimer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - trackingStart) / 1000);
+    const h = Math.floor(elapsed / 3600);
+    const m = Math.floor((elapsed % 3600) / 60);
+    const s = elapsed % 60;
+    document.getElementById('tracking-elapsed').textContent = 
+      `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    
+    // Simulate km and speed
+    simKm += 0.012; // ~ 43 km/h average
+    simTempo = 35 + Math.round(Math.random() * 25);
+    document.getElementById('tracking-km').textContent = simKm.toFixed(1).replace('.', ',');
+    document.getElementById('tracking-tempo').textContent = simTempo;
+  }, 1000);
+}
+
+function stopTracking() {
+  if (trackingTimer) {
+    clearInterval(trackingTimer);
+    trackingTimer = null;
+  }
+  goto('debrief');
+}
+
+function selectRating(el) {
+  el.parentElement.querySelectorAll('.rating-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function saveAndGoHome() {
+  // Simulate: increase fortschritt
+  STATE.fortschritt.kmGefahren += 11;
+  STATE.fortschritt.fahrten += 1;
+  // Re-render home
+  document.querySelector('[data-view="home"]').outerHTML = renderHome();
+  goto('home');
+}
+
+function startQuiz(themaId) {
+  STATE.quiz.activeThema = themaId;
+  STATE.quiz.aktuelleFrage = 0;
+  STATE.quiz.antworten = [];
+  goto('quiz');
+  renderQuizContent(themaId);
+}
+
+function answerQuiz(answerIdx, korrekt) {
+  const thema = REFRESHER_THEMEN.find(t => t.id === STATE.quiz.activeThema);
+  const frage = thema.fragen[STATE.quiz.aktuelleFrage];
+  
+  STATE.quiz.antworten.push(korrekt);
+  
+  document.querySelectorAll('.quiz-answer').forEach((b, i) => {
+    b.disabled = true;
+    if (i === answerIdx) {
+      b.classList.add(korrekt ? 'correct' : 'wrong');
+    }
+    if (!korrekt && frage.antworten[i].korrekt) {
+      b.classList.add('correct');
+    }
+  });
+  
+  const feedback = document.getElementById('quizFeedback');
+  feedback.classList.add('show');
+  if (!korrekt) feedback.classList.add('wrong');
+  
+  document.getElementById('feedbackLabel').textContent = korrekt ? '»» Richtig' : '»» Falsch';
+  document.getElementById('feedbackText').textContent = frage.erklaerung;
+  
+  setTimeout(() => {
+    document.getElementById('screen').scrollTo({ top: 600, behavior: 'smooth' });
+  }, 200);
+}
+
+function nextQuestion(themaId) {
+  STATE.quiz.aktuelleFrage++;
+  renderQuizContent(themaId);
+  document.getElementById('screen').scrollTop = 0;
+}
+
+function filterRoutes(key) {
+  renderRoutesContent(key);
+}
+
+function showRoute(routeId) {
+  goto('route-detail');
+  renderRouteDetailContent(routeId);
+}
+
+// =========================================================================
+// INIT
+// =========================================================================
+renderViews();
+</script>
+
+</body>
+</html>
